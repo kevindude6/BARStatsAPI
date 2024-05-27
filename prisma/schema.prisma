@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id            Int             @id
+  lastKnownName String
+  lastDuel      DateTime        @default("1970-01-01T00:00:00Z")
+  lastFFA       DateTime        @default("1970-01-01T00:00:00Z")
+  lastTeam      DateTime        @default("1970-01-01T00:00:00Z")
+  duelSkill     Float           @default(-1)
+  duelSkillUn   Float           @default(-1)
+  teamSkill     Float           @default(-1)
+  teamSkillUn   Float           @default(-1)
+  ffaSkill      Float           @default(-1)
+  ffaSkillUn    Float           @default(-1)
+  StartPosition StartPosition[]
+}
+
+model Replay {
+  id             String          @id
+  map            Map             @relation(fields: [mapId], references: [id])
+  winningPlayers Int[]
+  losingPlayers  Int[]
+  awards         Json            @db.JsonB
+  players        Json            @db.JsonB
+  time           DateTime
+  gameType       String
+  duration       Int             @db.Integer
+  mapId          Int
+  StartPosition  StartPosition[]
+}
+
+model Map {
+  id            Int             @id
+  fileName      String
+  scriptName    String
+  cleanName     String
+  width         Int
+  height        Int
+  Replay        Replay[]
+  StartPosition StartPosition[]
+  StartBox      StartBox[]
+}
+
+model StartPosition {
+  player   Player @relation(fields: [playerId], references: [id])
+  map      Map    @relation(fields: [mapId], references: [id])
+  replay   Replay @relation(fields: [replayId], references: [id])
+  xPos     Float
+  yPos     Float
+  zPos     Float
+  mapId    Int
+  playerId Int
+  replayId String
+
+  @@id([playerId, replayId])
+}
+
+model StartBox {
+  map    Map    @relation(fields: [mapId], references: [id])
+  id     Int
+  xPos   Float
+  zPos   Float
+  width  Float
+  height Float
+  name   String
+  role   String
+  mapId  Int
+
+  @@id([mapId, id])
+}
