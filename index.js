@@ -36,6 +36,7 @@ app.get("/playerMatches", async (req, res) => {
   const out = {
     matches,
     playerInfo,
+    targetPlayer: player,
   };
   res.json(out);
 });
@@ -74,6 +75,23 @@ app.get("/stats", async (req, res) => {
 app.get("/maps", async (req, res) => {
   const maps = await prisma.map.findMany();
   res.json(maps);
+});
+app.get("/player", async (req, res) => {
+  const player = await prisma.player.findFirst({ where: { lastKnownName: req.query.playerName } });
+  res.json(player);
+});
+app.post("/startPositions", async (req, res) => {
+  const mapIds = req.body.mapIds;
+  const playerId = req.body.playerId;
+  const startPositions = await prisma.startPosition.findMany({
+    where: {
+      playerId: playerId,
+      mapId: {
+        in: mapIds,
+      },
+    },
+  });
+  res.json(startPositions);
 });
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);

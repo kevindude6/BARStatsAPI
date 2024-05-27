@@ -1,0 +1,18 @@
+meta {
+  name: Starts
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{Endpoint}}/startPositions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "playerId": 108724,
+    "mapIds": [508,519,430]
+  }
+}
