@@ -73,7 +73,7 @@ app.get("/stats", async (req, res) => {
   res.sendStatus(200);
 });
 app.get("/maps", async (req, res) => {
-  const maps = await prisma.map.findMany();
+  const maps = await prisma.map.findMany({ orderBy: { fileName: "asc" } });
   res.json(maps);
 });
 app.get("/player", async (req, res) => {
