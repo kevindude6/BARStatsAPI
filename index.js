@@ -16,6 +16,10 @@ app.get("/test", async (req, res) => {
 });
 app.get("/playerMatches", async (req, res) => {
   const player = await prisma.player.findFirst({ where: { lastKnownName: req.query.playerId } });
+  if (player == null) {
+    res.status(404).send("Player not found");
+    return;
+  }
   const matches = await prisma.replay.findMany({
     where: {
       OR: [
