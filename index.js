@@ -1,11 +1,22 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { GetPlayersFromMatches } from "./helper.js";
+import { GetPlayersFromMatches, DataProcessMatches } from "./helper.js";
 import express from "express";
 
 const app = express();
 const port = 3000;
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends({
+  result: {
+    replay: {
+      playerCount: {
+        needs: { losingPlayers: true, winningPlayers: true },
+        compute(replay) {
+          return replay.losingPlayers.length + replay.winningPlayers.length;
+        },
+      },
+    },
+  },
+});
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Yay");
@@ -74,6 +85,63 @@ app.get("/stats", async (req, res) => {
 
   const outData = {};
   //GetPlayersFromMatches(prisma, matches);
+  res.sendStatus(200);
+});
+app.post("/playerStats", async (req, res) => {
+  const playerName = req.body.playerName;
+  if (playerName == null) {
+    res.status(404).send("Player required!");
+    return;
+  }
+  const startTime = req.body.startTime == null ? new Date("2024-01-01") : new Date(req.body.startTime);
+  const endTime = req.body.endTime == null ? new Date() : new Date(req.body.endTime);
+  const minPlayers = req.body.minPlayers ?? 2;
+  const maxPlayers = req.body.maxPlayers ?? 16;
+  const selectedMaps = req.body.maps ?? "all";
+
+  const player = await prisma.player.findFirst({ where: { lastKnownName: playerName } });
+
+  let mapWhere = {};
+  if (selectedMaps !== "all") {
+    const mapIds = selectedMaps.map((m) => {
+      return {
+        mapId: m,
+      };
+    });
+    mapWhere = { OR: [...mapIds] };
+  }
+  const matches = await prisma.replay.findMany({
+    where: {
+      AND: [
+        {
+          OR: [
+            {
+              winningPlayers: {
+                has: player.id,
+              },
+            },
+            {
+              losingPlayers: {
+                has: player.id,
+              },
+            },
+          ],
+        },
+        {
+          time: { gte: startTime, lte: endTime },
+        },
+        mapWhere,
+      ],
+    },
+  });
+
+  const filtered = [];
+  for (const match of matches) {
+    if (match.playerCount >= minPlayers && match.playerCount <= maxPlayers) filtered.push(match);
+  }
+
+  DataProcessMatches(player.id, filtered);
+  //console.log(filtered);
   res.sendStatus(200);
 });
 app.get("/maps", async (req, res) => {
