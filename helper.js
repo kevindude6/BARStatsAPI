@@ -34,6 +34,15 @@ export const GetPlayersFromMatches = async (prisma, matches, onlyName) => {
   return players;
 };
 
+export const GetStartPositionsForPlayer = async (prisma, playerId) => {
+  const startPositions = await prisma.startPosition.findMany({
+    where: {
+      playerId: playerId,
+    },
+  });
+  return startPositions;
+};
+
 export const DataProcessMatches = (targetPlayerId, matches) => {
   const rows = matches.map((m) => {
     const pObj = m.players[targetPlayerId];

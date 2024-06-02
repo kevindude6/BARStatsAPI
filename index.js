@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { GetPlayersFromMatches, DataProcessMatches } from "./helper.js";
+import { GetPlayersFromMatches, DataProcessMatches, GetStartPositionsForPlayer } from "./helper.js";
 import express from "express";
 
 const app = express();
@@ -47,6 +47,19 @@ app.get("/playerMatches", async (req, res) => {
       ],
     },
   });
+
+  // Need to find the player start pos for each match
+  const startPositions = await GetStartPositionsForPlayer(prisma, player.id);
+  const startMap = {};
+  // Build a dictionary for fast lookup
+  for (const start of startPositions) {
+    startMap[start.replayId] = start;
+  }
+  // Assign to each match
+  for (const match of matches) {
+    match.targetPlayerStart = startMap[match.id];
+  }
+
   const playerInfo = await GetPlayersFromMatches(prisma, matches, true);
   const out = {
     matches,
