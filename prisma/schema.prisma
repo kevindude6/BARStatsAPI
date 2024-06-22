@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -9,19 +8,22 @@ datasource db {
 }
 
 model Player {
-  id            Int             @id
-  lastKnownName String
-  duelSkill     Float           @default(-1)
-  duelSkillUn   Float           @default(-1)
-  ffaSkill      Float           @default(-1)
-  ffaSkillUn    Float           @default(-1)
-  teamSkill     Float           @default(-1)
-  teamSkillUn   Float           @default(-1)
-  lastDuel      DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
-  lastFFA       DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
-  lastTeam      DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
-  countryCode   String          @default("UNK")
-  StartPosition StartPosition[]
+  id               Int             @id
+  lastKnownName    String
+  duelSkill        Float           @default(-1)
+  duelSkillUn      Float           @default(-1)
+  ffaSkill         Float           @default(-1)
+  ffaSkillUn       Float           @default(-1)
+  teamSkill        Float           @default(-1)
+  teamSkillUn      Float           @default(-1)
+  smallTeamSkill   Float           @default(-1)
+  smallTeamSkillUn Float           @default(-1)
+  lastDuel         DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+  lastFFA          DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+  lastTeam         DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+  lastSmallTeam    DateTime        @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+  countryCode      String          @default("UNK")
+  StartPosition    StartPosition[]
 }
 
 model Replay {
