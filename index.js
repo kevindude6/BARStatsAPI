@@ -178,7 +178,6 @@ app.post("/startPositions", async (req, res) => {
   });
   res.json(startPositions);
 });
-
 app.get("/allMatches", async (req, res) => {
   const limit = Number(req.query.limit);
   const offset = Number(req.query.offset);
@@ -191,7 +190,6 @@ app.get("/allMatches", async (req, res) => {
   });
   res.status(200).json(replays);
 });
-
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
