@@ -178,6 +178,20 @@ app.post("/startPositions", async (req, res) => {
   });
   res.json(startPositions);
 });
+
+app.get("/allMatches", async (req, res) => {
+  const limit = Number(req.query.limit);
+  const offset = Number(req.query.offset);
+  const replays = await prisma.replay.findMany({
+    take: limit,
+    skip: offset,
+    orderBy: {
+      time: "asc",
+    },
+  });
+  res.status(200).json(replays);
+});
+
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
