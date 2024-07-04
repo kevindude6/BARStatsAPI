@@ -39,6 +39,10 @@ model Replay {
   ranked         Boolean         @default(true)
   map            Map             @relation(fields: [mapId], references: [id])
   StartPosition  StartPosition[]
+  playerCount    Int?
+  minSkill       Float?
+  maxSkill       Float?
+  avgSkill       Float?
 
   @@index([winningPlayers, losingPlayers], map: "replay_player_index", type: Gin)
 }
