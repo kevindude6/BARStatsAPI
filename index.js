@@ -46,6 +46,9 @@ app.get("/playerMatches", async (req, res) => {
         },
       ],
     },
+    orderBy: {
+      time: "asc",
+    },
   });
 
   // Need to find the player start pos for each match
