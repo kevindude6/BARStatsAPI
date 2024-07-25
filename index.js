@@ -206,7 +206,10 @@ app.get("/global", async (req, res) => {
   });
 
   const playerLookup = await GetPlayersFromGlobal(prisma, mostRecent);
-  mostRecent.playerLookup = playerLookup;
+  mostRecent.playerLookup = playerLookup.reduce((prev, cur) => {
+    prev[cur.id] = cur.lastKnownName;
+    return prev;
+  }, {});
   res.status(200).json(mostRecent);
 });
 app.listen(port, () => {
