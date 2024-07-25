@@ -193,6 +193,14 @@ app.get("/allMatches", async (req, res) => {
   });
   res.status(200).json(replays);
 });
+app.get("/global", async (req, res) => {
+  const mostRecent = await prisma.analysisData.findFirst({
+    orderBy: {
+      calculationTime: "desc",
+    },
+  });
+  res.status(200).json(mostRecent);
+});
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
