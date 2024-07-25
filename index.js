@@ -1,5 +1,10 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { GetPlayersFromMatches, DataProcessMatches, GetStartPositionsForPlayer } from "./helper.js";
+import {
+  GetPlayersFromMatches,
+  DataProcessMatches,
+  GetStartPositionsForPlayer,
+  GetPlayersFromGlobal,
+} from "./helper.js";
 import express from "express";
 
 const app = express();
@@ -199,6 +204,9 @@ app.get("/global", async (req, res) => {
       calculationTime: "desc",
     },
   });
+
+  const playerLookup = await GetPlayersFromGlobal(prisma, mostRecent);
+  mostRecent.playerLookup = playerLookup;
   res.status(200).json(mostRecent);
 });
 app.listen(port, () => {

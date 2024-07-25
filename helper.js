@@ -34,6 +34,38 @@ export const GetPlayersFromMatches = async (prisma, matches, onlyName) => {
   return players;
 };
 
+export const GetPlayersFromGlobal = async (prisma, global) => {
+  const playerDict = {};
+  const addSection = (field) => {
+    if (global[field]["ACTIVE-PLAYERS"] == null || global[field]["ACTIVE-PLAYERS"].top25 == null) return;
+    for (const entry of global[field]["ACTIVE-PLAYERS"].top25) {
+      if (!(entry[0] in playerDict)) {
+        playerDict[entry[0]] = Number(entry[0]);
+      }
+    }
+  };
+
+  addSection("weekAll");
+  addSection("monthAll");
+  addSection("totalAll");
+  addSection("weekSkilled");
+  addSection("monthSkilled");
+  addSection("totalSkilled");
+
+  const players = await prisma.player.findMany({
+    where: {
+      id: {
+        in: Object.values(playerDict),
+      },
+    },
+    select: {
+      id: true,
+      lastKnownName: true,
+    },
+  });
+  return players;
+};
+
 export const GetStartPositionsForPlayer = async (prisma, playerId) => {
   const startPositions = await prisma.startPosition.findMany({
     where: {
