@@ -88,3 +88,15 @@ model StartBox {
 
   @@id([mapId, id])
 }
+
+model AnalysisData {
+  id              Int      @id @default(autoincrement())
+  calculationTime DateTime
+  weekAll         Json
+  monthAll        Json
+  totalAll        Json
+  weekSkilled     Json
+  monthSkilled    Json
+  totalSkilled    Json
+  playerSkills    Json
+}
