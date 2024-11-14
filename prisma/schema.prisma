@@ -43,6 +43,8 @@ model Replay {
   minSkill       Float?
   maxSkill       Float?
   avgSkill       Float?
+  dataset        String?         @default("public")
+  tweakdefId     String[]        @default([])
 
   @@index([winningPlayers, losingPlayers], map: "replay_player_index", type: Gin)
 }
@@ -99,4 +101,10 @@ model AnalysisData {
   monthSkilled    Json
   totalSkilled    Json
   playerSkills    Json
+}
+
+model TweakDefs {
+  hash        String @id
+  value       String
+  replayCount Int    @default(0)
 }
