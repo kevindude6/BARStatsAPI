@@ -212,6 +212,29 @@ app.get("/global", async (req, res) => {
   }, {});
   res.status(200).json(mostRecent);
 });
+app.get("/tweaks", async (req, res) => {
+  const tweakDefs = await prisma.tweakDefs.findMany({
+    orderBy: {
+      replayCount: "desc",
+    },
+    where: {
+      replayCount: {
+        gte: 5,
+      },
+    },
+  });
+  const tweakUnits = await prisma.tweakUnits.findMany({
+    orderBy: {
+      replayCount: "desc",
+    },
+    where: {
+      replayCount: {
+        gte: 5,
+      },
+    },
+  });
+  res.status(200).json({ tweakDefs: tweakDefs, tweakUnits: tweakUnits });
+});
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });

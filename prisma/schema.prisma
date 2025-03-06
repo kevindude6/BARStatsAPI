@@ -45,6 +45,7 @@ model Replay {
   avgSkill       Float?
   dataset        String?         @default("public")
   tweakdefId     String[]        @default([])
+  tweakunitId    String[]        @default([])
 
   @@index([winningPlayers, losingPlayers], map: "replay_player_index", type: Gin)
 }
@@ -70,7 +71,7 @@ model StartPosition {
   replayId String
   map      Map    @relation(fields: [mapId], references: [id])
   player   Player @relation(fields: [playerId], references: [id])
-  replay   Replay @relation(fields: [replayId], references: [id])
+  replay   Replay @relation(fields: [replayId], references: [id], onDelete: Cascade)
 
   @@id([playerId, replayId])
   @@index([xPos, zPos], map: "start_pos_btree_index")
@@ -104,6 +105,12 @@ model AnalysisData {
 }
 
 model TweakDefs {
+  hash        String @id
+  value       String
+  replayCount Int    @default(0)
+}
+
+model TweakUnits {
   hash        String @id
   value       String
   replayCount Int    @default(0)
