@@ -250,7 +250,7 @@ app.get("/namesearch", async (req, res) => {
       countryCode: true,
       id: true,
     },
-    take: 15,
+    take: 30,
   });
   res.status(200).json({ players });
 });
