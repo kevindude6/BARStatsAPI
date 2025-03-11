@@ -1,0 +1,11 @@
+meta {
+  name: Get Backups
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://backend.panel.bytehosting.cloud/v1/service/{{serviceid}}/backup
+  body: none
+  auth: none
+}

@@ -235,6 +235,25 @@ app.get("/tweaks", async (req, res) => {
   });
   res.status(200).json({ tweakDefs: tweakDefs, tweakUnits: tweakUnits });
 });
+app.get("/namesearch", async (req, res) => {
+  const name = req.query.name;
+  const escapedName = name.replace("_", "\\_");
+  const players = await prisma.player.findMany({
+    where: {
+      lastKnownName: {
+        contains: escapedName,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      lastKnownName: true,
+      countryCode: true,
+      id: true,
+    },
+    take: 15,
+  });
+  res.status(200).json({ players });
+});
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
