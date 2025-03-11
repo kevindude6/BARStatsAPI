@@ -1,5 +1,10 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { GetPlayersFromMatches, DataProcessMatches, GetStartPositionsForPlayer } from "./helper.js";
+import {
+  GetPlayersFromMatches,
+  DataProcessMatches,
+  GetStartPositionsForPlayer,
+  GetPlayersFromGlobal,
+} from "./helper.js";
 import express from "express";
 
 const app = express();
@@ -45,6 +50,9 @@ app.get("/playerMatches", async (req, res) => {
           },
         },
       ],
+    },
+    orderBy: {
+      time: "asc",
     },
   });
 
@@ -178,7 +186,6 @@ app.post("/startPositions", async (req, res) => {
   });
   res.json(startPositions);
 });
-
 app.get("/allMatches", async (req, res) => {
   const limit = Number(req.query.limit);
   const offset = Number(req.query.offset);
@@ -191,7 +198,62 @@ app.get("/allMatches", async (req, res) => {
   });
   res.status(200).json(replays);
 });
+app.get("/global", async (req, res) => {
+  const mostRecent = await prisma.analysisData.findFirst({
+    orderBy: {
+      calculationTime: "desc",
+    },
+  });
 
+  const playerLookup = await GetPlayersFromGlobal(prisma, mostRecent);
+  mostRecent.playerLookup = playerLookup.reduce((prev, cur) => {
+    prev[cur.id] = cur.lastKnownName;
+    return prev;
+  }, {});
+  res.status(200).json(mostRecent);
+});
+app.get("/tweaks", async (req, res) => {
+  const tweakDefs = await prisma.tweakDefs.findMany({
+    orderBy: {
+      replayCount: "desc",
+    },
+    where: {
+      replayCount: {
+        gte: 5,
+      },
+    },
+  });
+  const tweakUnits = await prisma.tweakUnits.findMany({
+    orderBy: {
+      replayCount: "desc",
+    },
+    where: {
+      replayCount: {
+        gte: 5,
+      },
+    },
+  });
+  res.status(200).json({ tweakDefs: tweakDefs, tweakUnits: tweakUnits });
+});
+app.get("/namesearch", async (req, res) => {
+  const name = req.query.name;
+  const escapedName = name.replace("_", "\\_");
+  const players = await prisma.player.findMany({
+    where: {
+      lastKnownName: {
+        contains: escapedName,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      lastKnownName: true,
+      countryCode: true,
+      id: true,
+    },
+    take: 30,
+  });
+  res.status(200).json({ players });
+});
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });

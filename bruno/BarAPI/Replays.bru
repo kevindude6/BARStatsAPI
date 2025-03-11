@@ -5,15 +5,16 @@ meta {
 }
 
 get {
-  url: https://api.bar-rts.com/replays?page=0&limit=10000&hasBots=false&endedNormally=true&date=2024-01-01
+  url: https://api.bar-rts.com/replays?page=1&limit=10000&hasBots=false&endedNormally=true&players=Teifion
   body: none
   auth: none
 }
 
 query {
-  page: 0
+  page: 1
   limit: 10000
   hasBots: false
   endedNormally: true
-  date: 2024-01-01
+  players: Teifion
+  ~date: 2021-12-01
 }
