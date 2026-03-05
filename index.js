@@ -213,27 +213,22 @@ app.get("/global", async (req, res) => {
   res.status(200).json(mostRecent);
 });
 app.get("/tweaks", async (req, res) => {
-  const tweakDefs = await prisma.tweakDefs.findMany({
-    orderBy: {
-      replayCount: "desc",
-    },
-    where: {
-      replayCount: {
-        gte: 5,
-      },
-    },
+  console.log("Accessing tweaks");
+  const limit = Number(req.query.limit) || 10;
+  const offset = Number(req.query.offset) || 0;
+  const where = { replayCount: { gte: 5 }, value: { not: "0" } };
+  const orderBy = { replayCount: "desc" };
+  const [tweakDefs, tweakDefsTotal, tweakUnits, tweakUnitsTotal] =
+    await Promise.all([
+      prisma.tweakDefs.findMany({ orderBy, where, take: limit, skip: offset }),
+      prisma.tweakDefs.count({ where }),
+      prisma.tweakUnits.findMany({ orderBy, where, take: limit, skip: offset }),
+      prisma.tweakUnits.count({ where }),
+    ]);
+  res.status(200).json({
+    tweakDefs: { data: tweakDefs, total: tweakDefsTotal },
+    tweakUnits: { data: tweakUnits, total: tweakUnitsTotal },
   });
-  const tweakUnits = await prisma.tweakUnits.findMany({
-    orderBy: {
-      replayCount: "desc",
-    },
-    where: {
-      replayCount: {
-        gte: 5,
-      },
-    },
-  });
-  res.status(200).json({ tweakDefs: tweakDefs, tweakUnits: tweakUnits });
 });
 app.get("/namesearch", async (req, res) => {
   const name = req.query.name;
